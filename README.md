@@ -1,2 +1,0 @@
-# projects
-Link to tableau visualizations: https://public.tableau.com/app/profile/sandro.zuppiger/viz/COVID-19Infectionsbycountry20202021/Dashboard1
