@@ -1,0 +1,1481 @@
+# Preisgestaltung FZAG: Experiment
+
+---
+title "Pricing FZAG"
+author "Sandro Zuppiger"
+
+
+#Arbeitsverzeichnis festlegen
+getwd()
+setwd("C:/Users/SandroZuppiger/Die Ergonomen Usability AG/Kundenprojekte - Dokumente/Flughafen Zürich/12_Preisgestaltung Angebots-Bundle/04_Ergebnisse/01_Analyse")
+
+#Installiere packages
+install.packages('rstatix')
+
+
+#Lade Packages
+library(ggplot2)
+library(readxl)
+library(dplyr)
+library(EnvStats)
+library(tidyverse)
+library(rstatix)
+
+#Define Colors
+colors_E <- c("#D10049", "#65081D", "#82D8CF", "#000000", "#3A5A58")
+
+# Import data // Note: Data Frames can hold several variable types, matrices just one variable type
+df <- read_excel("C:/Users/SandroZuppiger/Die Ergonomen Usability AG/Kundenprojekte - Dokumente/Flughafen Zürich/12_Preisgestaltung Angebots-Bundle/04_Ergebnisse/01_Analyse/20230323_data.xlsx")
+
+#Inspect Data
+summary(df$Mehr_zahlen) #String
+summary(df$Max_zabe)
+summary(df$Max_zabe_info)
+summary(df$Verständlichkeit_gesamt)
+summary(df$Verständlichkeit_gesamt_info)
+summary(df$Marktvergleich)
+summary(df$Marktvergleich_info)
+summary(df$Passen_club)
+summary(df$Passen_snack)
+
+
+
+################################################################################
+###################### Effects of Treatments ###################################
+################################################################################
+
+
+## Part 1 - Willingness to pay ##
+summary(df$P_4490)
+summary(df$P_4590)
+summary(df$P_4690)
+summary(df$P_4790)
+summary(df$P_4890)
+summary(df$P_4990)
+
+#Variation over all treatments#
+table_treatment_price <- xtabs(~ df$Treatment + df$P_4490 + df$P_4590 + df$P_4690 + df$P_4790 + df$P_4890 + df$P_4990)
+table_treatment_price
+
+df_t1 <- df %>% 
+  filter(
+    Treatment == 1
+  ) 
+
+df_t1 <- df_t1 %>% 
+  summarise(
+    percentage_4490 = (sum(P_4490)/nrow(df_t1))*100, 
+    percentage_4590 = (sum(P_4590)/nrow(df_t1))*100,
+    percentage_4690 = (sum(P_4690)/nrow(df_t1))*100,
+    percentage_4790 = (sum(P_4790)/nrow(df_t1))*100,
+    percentage_4890 = (sum(P_4890)/nrow(df_t1))*100,
+    percentage_4990 = (sum(P_4990)/nrow(df_t1))*100,
+  )%>% 
+  mutate(Treatment = 1)
+
+view(df_t1)
+
+df_t2 <- df %>% 
+  filter(
+    Treatment == 2
+  ) 
+
+df_t2 <- df_t2 %>% 
+  summarise(
+    percentage_4490 = (sum(P_4490)/nrow(df_t2))*100, 
+    percentage_4590 = (sum(P_4590)/nrow(df_t2))*100,
+    percentage_4690 = (sum(P_4690)/nrow(df_t2))*100,
+    percentage_4790 = (sum(P_4790)/nrow(df_t2))*100,
+    percentage_4890 = (sum(P_4890)/nrow(df_t2))*100,
+    percentage_4990 = (sum(P_4990)/nrow(df_t2))*100,
+  )%>% 
+  mutate(Treatment = 2)
+
+view(df_t2)
+
+
+df_t3 <- df %>% 
+  filter(
+    Treatment == 3
+  ) 
+
+df_t3 <- df_t3 %>% 
+  summarise(
+    percentage_4490 = (sum(P_4490)/nrow(df_t3))*100, 
+    percentage_4590 = (sum(P_4590)/nrow(df_t3))*100,
+    percentage_4690 = (sum(P_4690)/nrow(df_t3))*100,
+    percentage_4790 = (sum(P_4790)/nrow(df_t3))*100,
+    percentage_4890 = (sum(P_4890)/nrow(df_t3))*100,
+    percentage_4990 = (sum(P_4990)/nrow(df_t3))*100,
+  )%>% 
+  mutate(Treatment = 3)
+
+view(df_t3)
+
+df_t4 <- df %>% 
+  filter(
+    Treatment == 4
+  ) 
+
+df_t4 <- df_t4 %>% 
+  summarise(
+    percentage_4490 = (sum(P_4490)/nrow(df_t4))*100, 
+    percentage_4590 = (sum(P_4590)/nrow(df_t4))*100,
+    percentage_4690 = (sum(P_4690)/nrow(df_t4))*100,
+    percentage_4790 = (sum(P_4790)/nrow(df_t4))*100,
+    percentage_4890 = (sum(P_4890)/nrow(df_t4))*100,
+    percentage_4990 = (sum(P_4990)/nrow(df_t4))*100,
+  ) %>% 
+  mutate(Treatment = 4)
+
+
+view(df_t4)
+
+
+df_all <- rbind(df_t1, df_t2, df_t3, df_t4) 
+
+df_all <- as_tibble(df_all)%>% 
+  select(Treatment, percentage_4490:percentage_4990) %>% 
+  pivot_longer(
+    cols = percentage_4490:percentage_4990, 
+    names_to = 'Price Point', names_prefix = 'percentage_',
+    values_to = 'Percentage')
+
+view(df_all)
+
+## Price-Point 44.90 ##
+
+df_4490 <- df_all[df_all$`Price Point` == 4490, ]
+
+table_price_frequency_4490 <- xtabs(~ df_4490$Treatment + df_4490$Percentage)
+chisq.test(df_4490$Treatment, df_4490$Percentage)
+chisq.test(df_4490$Treatment, df_4490$Percentage)$expected
+chisq.test(df_4490$Treatment, df_4490$Percentage)$stdres
+
+chisq.test(df$P_4490, df$Treatment)
+chisq.test(df$Treatment, df$P_4490)$expected
+chisq.test(df$Treatment, df$P_4490)$observed
+chisq.test(df$Treatment, df$P_4490)$stdres
+
+round(2*pnorm(-abs(2.61904202)), 3)
+round(2*pnorm(-abs(3.24810738)), 3)
+
+## Price-Point 45.90 ##
+
+chisq.test(df$P_4590, df$Treatment)
+chisq.test(df$Treatment, df$P_4590)$expected
+chisq.test(df$Treatment, df$P_4590)$observed
+chisq.test(df$Treatment, df$P_4590)$stdres
+
+round(2*pnorm(-abs(2.8152727)), 3)
+
+
+## Price-Point 46.90 ##
+
+chisq.test(df$P_4690, df$Treatment)
+chisq.test(df$Treatment, df$P_4690)$expected
+chisq.test(df$Treatment, df$P_4690)$observed
+chisq.test(df$Treatment, df$P_4690)$stdres
+
+round(2*pnorm(-abs(2.3856781)), 3)
+round(2*pnorm(-abs(2.1969250)), 3)
+
+
+## Price-Point 47.90 ##
+
+chisq.test(df$P_4790, df$Treatment)
+chisq.test(df$Treatment, df$P_4790)$expected
+chisq.test(df$Treatment, df$P_4790)$observed
+chisq.test(df$Treatment, df$P_4790)$stdres
+
+round(2*pnorm(-abs(2.0641602)), 3)
+round(2*pnorm(-abs(2.1263219)), 3)
+
+## Price-Point 48.90 ##
+
+chisq.test(df$P_4890, df$Treatment)
+chisq.test(df$Treatment, df$P_4890)$expected
+chisq.test(df$Treatment, df$P_4890)$observed
+chisq.test(df$Treatment, df$P_4890)$stdres
+
+round(2*pnorm(-abs(1.2074918)), 3)
+round(2*pnorm(-abs(2.2121030)), 3)
+
+## Price-Point 49.90 ##
+
+chisq.test(df$P_4990, df$Treatment)
+chisq.test(df$Treatment, df$P_4990)$expected
+chisq.test(df$Treatment, df$P_4990)$observed
+chisq.test(df$Treatment, df$P_4990)$stdres
+
+round(2*pnorm(-abs(1.5121194)), 3)
+round(2*pnorm(-abs(2.4273005)), 3)
+
+
+#Visualization overall, only percentages
+
+df_all <- df_all %>% 
+  mutate(Treatment = as.factor(Treatment))
+
+ggplot(df_all, aes(x=`Price Point`, y=Percentage, color = Treatment))+geom_point(size = 2)
+
+vis_wtp_percentage <- ggplot(df_all, aes(x=`Price Point`, y=Percentage, color = Treatment))+geom_point(size = 3)
+
+vis_wtp_percentage + ylim(0, 100)
+
+#Visualization overall, percentages and sales volume
+
+df_all <- df_all %>% 
+  mutate(price_num = as.numeric(`Price Point`)) %>% 
+  mutate(sales_volume = price_num/100*Percentage/100*271)
+
+ggplot(df_all, aes(x=`Price Point`, y=sales_volume, color = Treatment))+geom_point(size=3)
+
+
+
+
+################################################################################
+
+## Part 2 - Willingness to pay MORE (dummy) ##
+
+#Comparison over all treatments#
+table_treatment_pay <- xtabs(~ df$Treatment + df$Mehr_zahlen)
+table_treatment_pay ## No counts below 5
+prop.table(table_treatment_pay)
+
+chisq.test(df$Treatment, df$Mehr_zahlen)
+chisq.test(df$Treatment, df$Mehr_zahlen)$expected
+chisq.test(df$Treatment, df$Mehr_zahlen)$observed
+chisq.test(df$Treatment, df$Mehr_zahlen)$stdres
+
+round(2*pnorm(-abs(1.3181191)), 3) #//T1 signifikant höher p=0.012
+round(2*pnorm(-abs(3.2954514)), 3) #//T4 signifikant tiefer p=0.008
+
+
+#Visualization overall
+vis_wtp_more <- df 
+
+vis_wtp_more <- vis_wtp_more %>% 
+  mutate(TreatmentF = as.factor(Treatment))
+
+vis_wtp_more <- vis_wtp_more%>% 
+  group_by(TreatmentF) %>% 
+  mutate(mean_meza = mean(Mehr_zahlen)) %>% 
+  select(mean_meza, TreatmentF)
+
+ggplot(vis_wtp_more, aes(x=TreatmentF, y=mean_meza, color = TreatmentF))+geom_point(size = 3)
+
+
+#Comparison between treatments (1-2)
+Treatment_1_2 <- df %>%
+  filter(
+    Treatment != 3,
+    Treatment != 4,
+  ) %>% 
+  select(
+    c('ID', 'Treatment', 'Mehr_zahlen')
+  )
+
+Treatment_1_2
+
+table_treatment_pay_t1_t2 <- xtabs(~ Treatment_1_2$Treatment + Treatment_1_2$Mehr_zahlen)
+table_treatment_pay_t1_t2
+prop.table(table_treatment_pay_t1_t2)
+
+fisher.test(Treatment_1_2$Treatment,Treatment_1_2$Mehr_zahlen)
+
+#Comparison between treatments (1-3)
+Treatment_1_3 <- df %>%
+  filter(
+    Treatment != 2,
+    Treatment != 4,
+  ) %>% 
+  select(
+    c('ID', 'Treatment', 'Mehr_zahlen')
+  )
+
+Treatment_1_3
+
+table_treatment_pay_t1_t3 <- xtabs(~ Treatment_1_3$Treatment + Treatment_1_3$Mehr_zahlen)
+table_treatment_pay_t1_t3
+prop.table(table_treatment_pay_t1_t3)
+
+fisher.test(Treatment_1_3$Treatment,Treatment_1_3$Mehr_zahlen)
+
+#Comparison between treatments (1-4)
+Treatment_1_4 <- df %>%
+  filter(
+    Treatment != 2,
+    Treatment != 3,
+  ) %>% 
+  select(
+    c('ID', 'Treatment', 'Mehr_zahlen')
+  )
+
+Treatment_1_4
+
+table_treatment_pay_t1_t4 <- xtabs(~ Treatment_1_4$Treatment + Treatment_1_4$Mehr_zahlen)
+table_treatment_pay_t1_t4
+prop.table(table_treatment_pay_t1_t4)
+
+fisher.test(Treatment_1_4$Treatment,Treatment_1_4$Mehr_zahlen)
+
+#Comparison between treatments (2-3)
+Treatment_2_3 <- df %>%
+  filter(
+    Treatment != 1,
+    Treatment != 4,
+  ) %>% 
+  select(
+    c('ID', 'Treatment', 'Mehr_zahlen')
+  )
+
+Treatment_2_3
+
+table_treatment_pay_t2_t3 <- xtabs(~ Treatment_2_3$Treatment + Treatment_2_3$Mehr_zahlen)
+table_treatment_pay_t2_t3
+prop.table(table_treatment_pay_t2_t3)
+
+fisher.test(Treatment_2_3$Treatment,Treatment_2_3$Mehr_zahlen)
+
+
+#Comparison between treatments (2-4)
+Treatment_2_4 <- df %>%
+  filter(
+    Treatment != 1,
+    Treatment != 3,
+  ) %>% 
+  select(
+    c('ID', 'Treatment', 'Mehr_zahlen')
+  )
+
+Treatment_2_4
+
+table_treatment_pay_t2_t4 <- xtabs(~ Treatment_2_4$Treatment + Treatment_2_4$Mehr_zahlen)
+table_treatment_pay_t2_t4
+prop.table(table_treatment_pay_t2_t4)
+
+fisher.test(Treatment_2_4$Treatment,Treatment_2_4$Mehr_zahlen)
+
+
+#Comparison between treatments (3-4)
+Treatment_3_4 <- df %>%
+  filter(
+    Treatment != 1,
+    Treatment != 2,
+  ) %>% 
+  select(
+    c('ID', 'Treatment', 'Mehr_zahlen')
+  )
+
+Treatment_3_4
+
+table_treatment_pay_t3_t4 <- xtabs(~ Treatment_3_4$Treatment + Treatment_3_4$Mehr_zahlen)
+table_treatment_pay_t3_t4
+prop.table(table_treatment_pay_t3_t4)
+
+fisher.test(Treatment_3_4$Treatment,Treatment_3_4$Mehr_zahlen)
+
+################################################################################
+## Part 3 - Willingness to pay beyond (amount) ##
+
+# Overall comparison #
+
+WTP_beyond <- df %>%
+  mutate(
+    TreatmentF = as.factor (Treatment)
+  ) %>% 
+  filter(
+    Mehr_zahlen != 0,
+    Max_zabe >= 49.90
+  ) %>% 
+  select(
+    c('ID', 'Mehr_zahlen','Max_zabe', 'TreatmentF')
+  )
+
+WTP_beyond
+boxplot(WTP_beyond$Max_zabe)
+
+WTP_beyond %>%
+  group_by(TreatmentF) %>%
+  summarise(
+    count = n(), 
+    mean_zabe = mean(Max_zabe)
+  )
+
+WTP_beyond %>%
+  group_by(TreatmentF) %>%
+  identify_outliers(Max_zabe)
+
+#Remove outliers ----> GIAN Luca
+
+Outliers <- WTP_beyond %>%
+  group_by(TreatmentF) %>%
+  identify_outliers(Max_zabe) %>%
+  filter(
+    is.extreme == TRUE|is.outlier == TRUE,
+  )
+
+Outliers #35 Outliers
+
+Zabe_clean <- anti_join(WTP_beyond, Outliers)
+
+Zabe_clean %>% 
+  group_by(TreatmentF) %>% 
+  summarise(
+    count = n(), 
+    mean_zabe = mean(Max_zabe)
+  )
+
+Zabe_clean %>% 
+  group_by(TreatmentF) %>% 
+  summarise(
+    count = n(), 
+    median_zabe = median(Max_zabe)
+  )
+
+hist(Zabe_clean$Max_zabe[Zabe_clean$TreatmentF == 1])
+hist(Zabe_clean$Max_zabe[Zabe_clean$TreatmentF == 2])
+hist(Zabe_clean$Max_zabe[Zabe_clean$TreatmentF == 3])
+hist(Zabe_clean$Max_zabe[Zabe_clean$TreatmentF == 4])
+
+boxplot(Zabe_clean$Max_zabe)
+
+kruskal.test(Max_zabe~TreatmentF, data = Zabe_clean) ## Result overall comparison
+
+
+#Visualization overall
+Zabe_clean <- Zabe_clean %>%
+  group_by(TreatmentF) %>% 
+  mutate(mean_zabe_cont = mean(Max_zabe))
+  
+  
+ggplot(Zabe_clean, aes(x=TreatmentF, y=mean_zabe_cont))+geom_bar(stat='identity', position = 'dodge')
+
+# Individual comparison # --> bonferroni corr
+
+# Treatment 1-2 #
+
+Zabe_clean_1_2 <- Zabe_clean %>% 
+  filter(
+    TreatmentF != '3',
+    TreatmentF != '4'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = Zabe_clean_1_2,  p.adjust.method = "bonferroni")
+
+
+# Treatment 1-3 #
+
+Zabe_clean_1_3 <- Zabe_clean %>% 
+  filter(
+    TreatmentF != '2',
+    TreatmentF != '4'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = Zabe_clean_1_3, p.adjust.method = "bonferroni")
+
+
+# Treatment 1-4 #
+
+Zabe_clean_1_4 <- Zabe_clean %>% 
+  filter(
+    TreatmentF != '2',
+    TreatmentF != '3'
+  )
+
+Zabe_clean_1_4
+
+wilcox.test(Max_zabe~TreatmentF, data = Zabe_clean_1_4, p.adjust.method = "bonferroni")
+
+
+# Treatment 2-3 #
+
+Zabe_clean_2_3 <- Zabe_clean %>% 
+  filter(
+    TreatmentF != '1',
+    TreatmentF != '4'
+  )
+
+Zabe_clean_2_3
+
+wilcox.test(Max_zabe~TreatmentF, data = Zabe_clean_2_3, p.adjust.method = "bonferroni")
+
+
+# Treatment 2-4 #
+
+Zabe_clean_2_4 <- Zabe_clean %>% 
+  filter(
+    TreatmentF != '1',
+    TreatmentF != '3'
+  )
+
+Zabe_clean_2_4
+
+wilcox.test(Max_zabe~TreatmentF, data = Zabe_clean_2_4, p.adjust.method = "bonferroni")
+
+
+# Treatment 3-4 #
+
+Zabe_clean_3_4 <- Zabe_clean %>% 
+  filter(
+    TreatmentF != '1',
+    TreatmentF != '2'
+  )
+
+Zabe_clean_3_4
+
+wilcox.test(Max_zabe~TreatmentF, data = Zabe_clean_3_4, p.adjust.method = "bonferroni")
+
+
+# Part 2a - would it make sense to increase the price and if so, to what price? ##
+
+zabe_clean_t1 <- Zabe_clean %>% 
+  filter(TreatmentF == 1)
+
+ggplot(zabe_clean_t1, aes(x=Max_zabe))+geom_histogram(binwidth = 10)+scale_x_continuous(breaks = seq(0, 700, by = 50))+scale_y_continuous(breaks = seq(0, 20, by = 2))
+
+
+# Price point check 
+
+#50
+zabe_clean_t1_P50 <- zabe_clean_t1 
+
+zabe_clean_t1_P50 <- zabe_clean_t1_P50%>% 
+  filter(Max_zabe >= 50)
+
+zabe_clean_t1_P50 <- zabe_clean_t1_P50%>% 
+  mutate(Umsatz_P50 = 50*nrow(zabe_clean_t1_P50))
+
+view(zabe_clean_t1_P50)
+
+
+#60
+zabe_clean_t1_P60 <- zabe_clean_t1 
+
+zabe_clean_t1_P60 <- zabe_clean_t1_P60%>% 
+  filter(Max_zabe >= 60)
+
+zabe_clean_t1_P60 <- zabe_clean_t1_P60%>%
+  mutate(Umsatz_P60 = 60*nrow(zabe_clean_t1_P60))
+
+view(zabe_clean_t1_P60)
+
+#70
+zabe_clean_t1_P70 <- zabe_clean_t1 
+
+zabe_clean_t1_P70 <- zabe_clean_t1_P70%>% 
+  filter(Max_zabe >= 70)
+
+zabe_clean_t1_P70 <- zabe_clean_t1_P70 %>% 
+  mutate(Umsatz_P70 = 70*nrow(zabe_clean_t1_P70))
+
+view(zabe_clean_t1_P70)
+
+#80
+zabe_clean_t1_P80 <- zabe_clean_t1 
+
+zabe_clean_t1_P80 <- zabe_clean_t1_P80%>% 
+  filter(Max_zabe >= 80)
+
+zabe_clean_t1_P80 <- zabe_clean_t1_P80%>% 
+  mutate(Umsatz_P80 = 80*nrow(zabe_clean_t1_P80))
+
+view(zabe_clean_t1_P80)
+
+#100
+zabe_clean_t1_P100 <- zabe_clean_t1 
+
+zabe_clean_t1_P100 <- zabe_clean_t1_P100%>% 
+  filter(Max_zabe >= 100)
+
+zabe_clean_t1_P100 <- zabe_clean_t1_P100%>% 
+  mutate(Umsatz_P100 = 100*nrow(zabe_clean_t1_P100))
+
+view(zabe_clean_t1_P100)
+
+#120
+zabe_clean_t1_P120 <- zabe_clean_t1 
+
+zabe_clean_t1_P120 <- zabe_clean_t1_P120%>% 
+  filter(Max_zabe >= 120)
+
+zabe_clean_t1_P120 <- zabe_clean_t1_P120%>% 
+  mutate(Umsatz_P120 = 120*nrow(zabe_clean_t1_P120))
+
+view(zabe_clean_t1_P120)
+
+
+#150
+zabe_clean_t1_P150 <- zabe_clean_t1 
+
+zabe_clean_t1_P150 <- zabe_clean_t1_P150%>% 
+  filter(Max_zabe >= 150)
+
+zabe_clean_t1_P150 <- zabe_clean_t1_P150%>% 
+  mutate(Umsatz_P150 = 150*nrow(zabe_clean_t1_P150))
+
+view(zabe_clean_t1_P150)
+
+#200
+zabe_clean_t1_P200 <- zabe_clean_t1 
+
+zabe_clean_t1_P200 <- zabe_clean_t1_P200%>% 
+  filter(Max_zabe >= 200)
+
+zabe_clean_t1_P200 <- zabe_clean_t1_P200%>% 
+  mutate(Umsatz_P200 = 200*nrow(zabe_clean_t1_P200))
+
+view(zabe_clean_t1_P200)
+
+
+#205
+zabe_clean_t1_P205 <- zabe_clean_t1 
+
+zabe_clean_t1_P205 <- zabe_clean_t1_P205%>% 
+  filter(Max_zabe >= 205)
+
+zabe_clean_t1_P205 <- zabe_clean_t1_P205%>% 
+  mutate(Umsatz_P205 = 205*nrow(zabe_clean_t1_P205))
+
+view(zabe_clean_t1_P205)
+
+
+#220
+zabe_clean_t1_P220 <- zabe_clean_t1 
+
+zabe_clean_t1_P220 <- zabe_clean_t1_P220%>% 
+  filter(Max_zabe >= 220)
+
+zabe_clean_t1_P220 <- zabe_clean_t1_P220%>% 
+  mutate(Umsatz_P220 = 220*nrow(zabe_clean_t1_P220))
+
+view(zabe_clean_t1_P220)
+
+
+#250
+zabe_clean_t1_P250 <- zabe_clean_t1 
+
+zabe_clean_t1_P250 <- zabe_clean_t1_P250%>% 
+  filter(Max_zabe >= 250)
+
+zabe_clean_t1_P250 <- zabe_clean_t1_P250%>% 
+  mutate(Umsatz_P250 = 250*nrow(zabe_clean_t1_P250))
+
+view(zabe_clean_t1_P250)
+
+
+umsatz_mehrzahlen_t1 <- rbind(zabe_clean_t1_P100, zabe_clean_t1_P120, zabe_clean_t1_P150, zabe_clean_t1_P200, zabe_clean_t1_P205, zabe_clean_t1_P220, zabe_clean_t1_P250)
+
+umsatz_mehrzahlen_t1 <- umsatz_mehrzahlen_t1 %>% 
+  select(Umsatz_P100, Umsatz_P120, Umsatz_P150, Umsatz_P200, Umsatz_P205, Umsatz_P220, Umsatz_P250)
+
+umsatz_mehrzahlen_t1 <- umsatz_mehrzahlen_t1 %>%
+    pivot_longer(
+    cols = Umsatz_P100:Umsatz_P250,
+    names_to = 'Pricet_point',
+    values_to = 'Umsatz')
+
+#Visualization
+ggplot(umsatz_mehrzahlen_t1, aes(x=Pricet_point, y=Umsatz))+geom_bar(stat='identity', position='dodge')+scale_y_continuous(breaks=c(0,1000,2000,3000,4000,5000,6000,7000, 8000))
+vis_wtp_beyond_barchart <- ggplot(umsatz_mehrzahlen_t1, aes(x=Pricet_point, y=Umsatz))+geom_bar(stat='identity', position='dodge')
+vis_wtp_beyond_barchart + ylim(0,8000)
+
+################################################################################
+## Part 3 - Willingness to pay below ##
+
+# Overall comparison #
+
+WTP_below <- df %>%
+  mutate(
+    TreatmentF = as.factor (Treatment)
+  ) %>% 
+  filter(
+    Mehr_zahlen != 1,
+    Max_zabe <= 44.90
+  ) %>% 
+  select(
+    c('ID', 'Mehr_zahlen','Max_zabe', 'TreatmentF')
+  )
+
+WTP_below
+boxplot(WTP_below$Max_zabe)
+
+WTP_below %>%
+  group_by(TreatmentF) %>%
+  summarise(
+    count = n(), 
+    mean_zabe = mean(Max_zabe)
+  )
+
+
+kruskal.test(Max_zabe~TreatmentF, data = WTP_below) ## Result overaell comparison
+
+#Visualization overall
+WTP_below <- WTP_below %>% 
+  group_by(TreatmentF) %>% 
+  mutate(mean_zabe_below_cont = mean(Max_zabe))
+
+ggplot(WTP_below, aes(x=TreatmentF, y=mean_zabe_below_cont))+geom_bar(stat='identity', position = 'dodge')
+
+
+# Individual comparison #
+
+# Treatment 1-2 #
+
+WTP_below_1_2 <- WTP_below %>% 
+  filter(
+    TreatmentF != '3',
+    TreatmentF != '4'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = WTP_below_1_2)
+
+
+# Treatment 1-3 #
+
+WTP_below_1_3 <- WTP_below %>% 
+  filter(
+    TreatmentF != '2',
+    TreatmentF != '4'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = WTP_below_1_3)
+
+
+# Treatment 1-4 #
+
+WTP_below_1_4 <- WTP_below %>% 
+  filter(
+    TreatmentF != '2',
+    TreatmentF != '3'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = WTP_below_1_4)
+
+
+# Treatment 2-3 #
+
+WTP_below_2_3 <- WTP_below %>% 
+  filter(
+    TreatmentF != '1',
+    TreatmentF != '4'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = WTP_below_2_3)
+
+# Treatment 2-4 #
+
+WTP_below_2_4 <- WTP_below %>% 
+  filter(
+    TreatmentF != '1',
+    TreatmentF != '3'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = WTP_below_2_4)
+
+# Treatment 3-4 #
+
+WTP_below_3_4 <- WTP_below %>% 
+  filter(
+    TreatmentF != '1',
+    TreatmentF != '2'
+  )
+
+wilcox.test(Max_zabe~TreatmentF, data = WTP_below_3_4)
+
+################################################################################
+## Part 4 - Marktvergleich ##
+
+# Overall comparison #
+
+Market <- df %>%
+  mutate(
+    TreatmentF = as.factor (Treatment)
+  ) %>% 
+    select(
+    c('ID', 'Marktvergleich','TreatmentF')
+  )
+
+boxplot(Market$Marktvergleich)
+
+Market %>%
+  group_by(TreatmentF) %>%
+  summarise(
+    count = n(), 
+    mean_marktvergleich = mean(Marktvergleich)
+  )
+
+
+kruskal.test(Marktvergleich~TreatmentF, data = Market) ## Result overaell comparison
+
+# Overall visualization
+
+Market <- Market %>%
+  group_by(TreatmentF) %>% 
+  mutate(mean_marktvergleich = mean(Marktvergleich))
+
+ggplot(Market, aes(x=TreatmentF, y=mean_marktvergleich))+geom_bar(stat='identity', position = 'dodge')+ylim(0,5)
+
+################################################################################
+##################### Effects of Information ###################################
+################################################################################
+
+#Part 1- Willingness to pay ex-ante/ex-post#
+summary(df$Mehr_zahlen_info)
+
+#Comparison over all treatments#
+table_treatment_pay_info <- xtabs(~ df$Treatment + df$Mehr_zahlen_info)
+table_treatment_pay_info ## No counts below 5
+prop.table(table_treatment_pay)
+
+chisq.test(df$Treatment, df$Mehr_zahlen_info)
+
+
+#Comparison ex-ante, ex-post, all treatments#
+summary(df$Max_zabe_ante)
+summary(df$Max_zabe_info)
+
+WTP_ante_post <- df %>%
+  mutate(
+    TreatmentF = as.factor (Treatment)
+  ) %>% 
+  filter(
+    Max_zabe_ante <= Max_zabe_info, #higher/lower
+      ) %>% 
+  select(
+    c('ID', 'Max_zabe_ante','Max_zabe_info', 'TreatmentF')
+  )
+
+## Removed 943-824 = 119 entries because higher before than after
+
+WTP_ante_post %>%
+  group_by(TreatmentF) %>%
+  summarise(
+    count = n(), 
+    mean_zabe_ante = mean(Max_zabe_ante), 
+    mean_zabe_post = mean(Max_zabe_info),
+  )
+
+WTP_ante_post %>%
+  group_by(TreatmentF) %>%
+  identify_outliers(Max_zabe_ante)
+
+Outliers_ante <- WTP_ante_post %>%
+  group_by(TreatmentF) %>%
+  identify_outliers(Max_zabe_ante) %>%
+  filter(
+    is.extreme == TRUE|is.outlier == TRUE,
+  )
+
+WTP_ante_post %>%
+  group_by(TreatmentF) %>%
+  identify_outliers(Max_zabe_info)
+
+Outliers_post <- WTP_ante_post %>%
+  group_by(TreatmentF) %>%
+  identify_outliers(Max_zabe_info) %>%
+  filter(
+    is.extreme == TRUE|is.outlier == TRUE,
+  )
+
+WTP_ante_post_cl <- anti_join(WTP_ante_post, Outliers_ante)
+
+WTP_ante_post_clean <- anti_join(WTP_ante_post_cl, Outliers_post)
+
+WTP_ante_post_clean
+
+WTP_ante_post_clean_2 <- WTP_ante_post_clean %>% 
+  pivot_longer(
+    cols = c(Max_zabe_ante, Max_zabe_info), 
+    names_to = 'Zeitpunkt',
+    values_to = 'za_be_value'
+  )
+
+WTP_ante_post_clean_2
+
+pairwise_wilcox_test(za_be_value~Zeitpunkt, data = WTP_ante_post_clean_2)
+
+ggplot(WTP_ante_post_clean_2, aes(x=Zeitpunkt, y=za_be_value, fill=TreatmentF))+geom_bar(stat='identity', position = 'dodge')
+
+ggplot(WTP_ante_post_clean_2, aes(x=Zeitpunkt, y=za_be_value, fill=TreatmentF))+geom_boxplot()
+
+
+
+#Computation of potential gain through information
+
+median(WTP_ante_post_clean_2$za_be_value[WTP_ante_post_clean_2$Zeitpunkt == 'Max_zabe_ante'])
+median(WTP_ante_post_clean_2$za_be_value[WTP_ante_post_clean_2$Zeitpunkt == 'Max_zabe_info'])
+
+med_ante <- median(WTP_ante_post_clean_2$za_be_value[WTP_ante_post_clean_2$Zeitpunkt == 'Max_zabe_ante'])
+med_post <- median(WTP_ante_post_clean_2$za_be_value[WTP_ante_post_clean_2$Zeitpunkt == 'Max_zabe_info'])
+
+(med_post-med_ante)/med_ante
+(med_post-med_ante)*(nrow(WTP_ante_post_clean_2)/2)
+
+#mean(WTP_ante_post_clean_2$za_be_value[WTP_ante_post_clean_2$Zeitpunkt == 'Max_zabe_ante'])
+#mean(WTP_ante_post_clean_2$za_be_value[WTP_ante_post_clean_2$Zeitpunkt == 'Max_zabe_info'])
+
+
+#Individual comparisons for each treatment
+
+#T1
+WTP_ante_post_T1 <- WTP_ante_post_clean_2 %>% 
+  filter(TreatmentF == 1)
+
+pairwise_wilcox_test(za_be_value~Zeitpunkt, data = WTP_ante_post_T1, p.adjust.method = "bonferroni")
+
+#T2
+WTP_ante_post_T2 <- WTP_ante_post_clean_2 %>% 
+  filter(TreatmentF == 2)
+
+pairwise_wilcox_test(za_be_value~Zeitpunkt, data = WTP_ante_post_T2, p.adjust.method = "bonferroni")
+
+#T3
+WTP_ante_post_T3 <- WTP_ante_post_clean_2 %>% 
+  filter(TreatmentF == 3)
+
+pairwise_wilcox_test(za_be_value~Zeitpunkt, data = WTP_ante_post_T3, p.adjust.method = "bonferroni")
+
+ggplot(WTP_ante_post_T3, aes(x=Zeitpunkt, y=za_be_value, fill=TreatmentF))+geom_boxplot(fill="#00BFC4")
+
+median(WTP_ante_post_T3$za_be_value[WTP_ante_post_T3$Zeitpunkt == 'Max_zabe_ante'])
+median(WTP_ante_post_T3$za_be_value[WTP_ante_post_T3$Zeitpunkt == 'Max_zabe_info'])
+
+med_ante_T3 <- median(WTP_ante_post_T3$za_be_value[WTP_ante_post_T3$Zeitpunkt == 'Max_zabe_ante'])
+med_post_T3 <- median(WTP_ante_post_T3$za_be_value[WTP_ante_post_T3$Zeitpunkt == 'Max_zabe_info'])
+
+(med_post_T3-med_ante_T3)/med_ante_T3
+(med_post_T3-med_ante_T3)*(nrow(WTP_ante_post_T3)/2)
+
+
+#T4
+WTP_ante_post_T4 <- WTP_ante_post_clean_2 %>% 
+  filter(TreatmentF == 4)
+
+pairwise_wilcox_test(za_be_value~Zeitpunkt, data = WTP_ante_post_T4, p.adjust.method = "bonferroni")
+
+
+#Part 2 - Marktvergleich ex-ante/ex-post#
+
+#Comparison ex-ante, ex-post, all treatments#
+summary(df$Marktvergleich)
+summary(df$Marktvergleich_info)
+
+Marktvergleich_ante_post <- df %>%
+  mutate(
+    TreatmentF = as.factor (Treatment)
+  ) %>% 
+  select(
+    c('ID', 'Marktvergleich','Marktvergleich_info', 'TreatmentF')
+  )
+
+Marktvergleich_ante_post <- Marktvergleich_ante_post %>% 
+  pivot_longer(
+    cols = c(Marktvergleich, Marktvergleich_info), 
+    names_to = 'Zeitpunkt',
+    values_to = 'Marktvergleich_value'
+  )
+
+pairwise_wilcox_test(Marktvergleich_value~Zeitpunkt, data = Marktvergleich_ante_post)
+
+Marktvergleich_ante_post <- Marktvergleich_ante_post %>% 
+  group_by(TreatmentF) 
+  
+pairwise_wilcox_test(Marktvergleich_value~Zeitpunkt, data = Marktvergleich_ante_post)
+
+
+# Visualisation
+
+Marktvergleich_ante_post <- Marktvergleich_ante_post %>% 
+  group_by(TreatmentF) %>% 
+  mutate(mean_marktvergleich = mean(Marktvergleich_value))
+
+
+ggplot(Marktvergleich_ante_post, aes(x=Zeitpunkt, y=mean_marktvergleich, fill=TreatmentF))+geom_bar(stat='identity', position = 'dodge')
+
+
+## Part 3 - Verständlichkeit ante/post ##
+
+# Overall comparison #
+
+#Verständlichkeit gesamt
+v_ante_ges <- df %>% 
+  select('ID', 'Verständlichkeit_gesamt') %>% 
+  mutate(mean_V_ges = mean(Verständlichkeit_gesamt))
+
+v_post_ges <- df %>% 
+  select('ID', 'Verständlichkeit_gesamt_info') %>% 
+  mutate(mean_V_ges_p = mean(Verständlichkeit_gesamt_info))
+
+v_ges_ap <- df %>% 
+  select('ID', 'Verständlichkeit_gesamt', 'Verständlichkeit_gesamt_info') %>% 
+  pivot_longer(
+    cols = c(Verständlichkeit_gesamt, Verständlichkeit_gesamt_info),
+    names_to = 'Zeitpunkt',
+    values_to = 'Verständlichkeit'
+  )
+
+pairwise_wilcox_test(Verständlichkeit~Zeitpunkt, data = v_ges_ap, p.adjusted.method = "bonferr")
+
+#Verständlichkeit priority
+v_ante_prio <- df %>% 
+  select('ID', 'Verständlichkeit_priority') %>% 
+  mutate(mean_V_prio = mean(Verständlichkeit_priority))
+
+v_post_prio <- df %>% 
+  select('ID', 'Verständlichkeit_priority_info') %>% 
+  mutate(mean_V_prio_p = mean(Verständlichkeit_priority_info))
+
+v_prio_ap <- df %>% 
+  select('ID', 'Verständlichkeit_priority', 'Verständlichkeit_priority_info') %>% 
+  pivot_longer(
+    cols = c(Verständlichkeit_priority, Verständlichkeit_priority_info),
+    names_to = 'Zeitpunkt',
+    values_to = 'Verständlichkeit'
+  )
+
+pairwise_wilcox_test(Verständlichkeit~Zeitpunkt, data = v_prio_ap, p.adjusted.method = "bonferr")
+
+
+#Verständlichkeit club_snack
+v_ante_clu_sna <- df %>% 
+  select('ID', 'Verständlichkeit_club_snack') %>% 
+  drop_na() %>% 
+  mutate(mean_V_clu_sna = mean(Verständlichkeit_club_snack))
+
+v_post_clu_sna <- df %>%
+  select('ID', 'Verständlichkeit_club_snack_info') %>%
+  drop_na() %>% 
+  mutate(mean_V_clu_sna_p = mean(Verständlichkeit_club_snack_info))
+
+v_clu_sna_ap <- df %>% 
+  select('ID', 'Verständlichkeit_club_snack', 'Verständlichkeit_club_snack_info') %>% 
+  pivot_longer(
+    cols = c(Verständlichkeit_club_snack, Verständlichkeit_club_snack_info),
+    names_to = 'Zeitpunkt',
+    values_to = 'Verständlichkeit'
+  )
+
+pairwise_wilcox_test(Verständlichkeit~Zeitpunkt, data = v_clu_sna_ap, p.adjusted.method = "bonferr")
+
+
+#Verständlichkeit club
+v_ante_clu <- df %>% 
+  select('ID', 'Verständlichkeit_club') %>%
+  drop_na() %>% 
+  mutate(mean_V_clu = mean(Verständlichkeit_club))
+
+v_post_clu <- df %>% 
+  select('ID', 'Verständlichkeit_club_info') %>%
+  drop_na() %>% 
+  mutate(mean_V_clu_p = mean(Verständlichkeit_club_info))
+
+v_clu_ap <- df %>% 
+  select('ID', 'Verständlichkeit_club', 'Verständlichkeit_club_info') %>% 
+  pivot_longer(
+    cols = c(Verständlichkeit_club, Verständlichkeit_club_info),
+    names_to = 'Zeitpunkt',
+    values_to = 'Verständlichkeit'
+  )
+
+pairwise_wilcox_test(Verständlichkeit~Zeitpunkt, data = v_clu_ap, p.adjusted.method = "bonferr")
+
+#Verständlichkeit snack
+v_ante_sna <- df %>% 
+  select('ID', 'Verständlichkeit_snack') %>%
+  drop_na() %>% 
+  mutate(mean_V_sna = mean(Verständlichkeit_snack))
+
+v_post_sna <- df %>% 
+  select('ID', 'Verständlichkeit_snack_info') %>%
+  drop_na() %>% 
+  mutate(mean_V_sna_p = mean(Verständlichkeit_snack_info))
+
+v_sna_ap <- df %>% 
+  select('ID', 'Verständlichkeit_snack', 'Verständlichkeit_snack_info') %>% 
+  pivot_longer(
+    cols = c(Verständlichkeit_snack, Verständlichkeit_snack_info),
+    names_to = 'Zeitpunkt',
+    values_to = 'Verständlichkeit'
+  )
+
+pairwise_wilcox_test(Verständlichkeit~Zeitpunkt, data = v_sna_ap, p.adjusted.method = "bonferr")
+
+
+#Verständlichkeit flexi
+v_ante_flexi <- df %>% 
+  select('ID', 'Verständlichkeit_flexi') %>%
+  drop_na() %>% 
+  mutate(mean_V_flexi = mean(Verständlichkeit_flexi))
+
+v_post_flexi <- df %>% 
+  select('ID', 'Verständlichkeit_flexi_info') %>%
+  drop_na() %>% 
+  mutate(mean_V_flexi_p = mean(Verständlichkeit_flexi_info))
+
+v_flexi_ap <- df %>% 
+  select('ID', 'Verständlichkeit_flexi', 'Verständlichkeit_flexi_info') %>% 
+  pivot_longer(
+    cols = c(Verständlichkeit_flexi, Verständlichkeit_flexi_info),
+    names_to = 'Zeitpunkt',
+    values_to = 'Verständlichkeit'
+  )
+
+pairwise_wilcox_test(Verständlichkeit~Zeitpunkt, data = v_flexi_ap, p.adjusted.method = "bonferr")
+
+
+#Verständlichkeit schnell
+v_ante_schnell <- df %>% 
+  select('ID', 'Verständlichkeit_schnell') %>%
+  drop_na() %>% 
+  mutate(mean_V_schnell = mean(Verständlichkeit_schnell))
+
+v_post_schnell <- df %>% 
+  select('ID', 'Verständlichkeit_schnell_info') %>%
+  drop_na() %>% 
+  mutate(mean_V_schnell_p = mean(Verständlichkeit_schnell_info))
+
+v_schnell_ap <- df %>% 
+  select('ID', 'Verständlichkeit_schnell', 'Verständlichkeit_schnell_info') %>% 
+  pivot_longer(
+    cols = c(Verständlichkeit_schnell, Verständlichkeit_schnell_info),
+    names_to = 'Zeitpunkt',
+    values_to = 'Verständlichkeit'
+  )
+
+pairwise_wilcox_test(Verständlichkeit~Zeitpunkt, data = v_schnell_ap, p.adjusted.method = "bonferr")
+
+
+################################################################################
+############################## Further Stats ###################################
+################################################################################
+
+
+## Part 1 - Attraktivität ##
+
+# Gesamt über Treatments
+
+attraktivität <- df %>% 
+  select('ID', 'Attraktivität_gesamt', 'Treatment')
+
+attraktivität %>% 
+  mutate(treatmentF = as.factor(Treatment))
+
+kruskal.test(Attraktivität_gesamt~Treatment, data = attraktivität) ## Result overaell comparison
+
+#Visualization
+vis_attraktivität_gesamt <- attraktivität
+
+vis_attraktivität_gesamt <- vis_attraktivität_gesamt %>% 
+  mutate(TreatmentF = as.factor(Treatment))
+
+vis_attraktivität_gesamt <- vis_attraktivität_gesamt%>% 
+  group_by(TreatmentF) %>% 
+  mutate(mean_attra_ges = mean(Attraktivität_gesamt)) %>% 
+  select(mean_attra_ges, TreatmentF)
+
+ggplot(vis_attraktivität_gesamt, aes(x=TreatmentF, y=mean_attra_ges, color = TreatmentF))+geom_point()
+
+
+# Attraktivität einzelne Features
+
+attraktivität_indiv <- df %>% 
+  select('ID', 'Attraktivität_priority', 'Attraktivität_club', 'Attraktivität_snack', 'Attraktivität_club_snack', 'Attraktivität_flexi', 'Attraktivität_schnell')
+
+summary(attraktivität_indiv)
+
+#Visualizations
+
+#Attraktivität priority
+
+p <- ggplot(attraktivität_indiv, aes(x=Attraktivität_priority))+geom_histogram()
+p+geom_vline(aes(xintercept=mean(Attraktivität_priority)),
+           color="blue", linetype="dashed", size=1)
+
+#Attraktivität club
+
+att_club <- attraktivität_indiv %>% 
+  select(Attraktivität_club)
+
+att_club_C <- na.omit(att_club)
+  
+p1 <- ggplot(att_club_C, aes(x=Attraktivität_club))+geom_histogram()
+p1+geom_vline(aes(xintercept=mean(Attraktivität_club)),
+             color="blue", linetype="dashed", size=1)
+
+
+
+#Attraktivität snack
+
+att_snack <- attraktivität_indiv %>% 
+  select(Attraktivität_snack)
+
+att_snack_C <- na.omit(att_snack)
+
+p2 <- ggplot(att_snack_C, aes(x=Attraktivität_snack))+geom_histogram()
+p2+geom_vline(aes(xintercept=mean(Attraktivität_snack)),
+              color="blue", linetype="dashed", size=1)
+
+
+#Attraktivität club+snack
+
+att_club_snack <- attraktivität_indiv %>% 
+  select(Attraktivität_club_snack)
+
+att_club_snack_C <- na.omit(att_club_snack)
+
+p3 <- ggplot(att_club_snack_C, aes(x=Attraktivität_club_snack))+geom_histogram()
+p3+geom_vline(aes(xintercept=mean(Attraktivität_club_snack)),
+              color="blue", linetype="dashed", size=1)
+
+
+#Attraktivität flexi
+
+att_flexi <- attraktivität_indiv %>% 
+  select(Attraktivität_flexi)
+
+att_flexi_C <- na.omit(att_flexi)
+
+p4 <- ggplot(att_flexi_C, aes(x=Attraktivität_flexi))+geom_histogram()
+p4+geom_vline(aes(xintercept=mean(Attraktivität_flexi)),
+              color="blue", linetype="dashed", size=1)
+
+#Attraktivität schnell
+
+att_schnell <- attraktivität_indiv %>% 
+  select(Attraktivität_schnell)
+
+att_schnell_C <- na.omit(att_schnell)
+
+p5 <- ggplot(att_schnell_C, aes(x=Attraktivität_schnell))+geom_histogram()
+p5+geom_vline(aes(xintercept=mean(Attraktivität_schnell)),
+              color="blue", linetype="dashed", size=1)
+
+
+## Part 2 - Relevanz ## tbd
+
+#Relevanz priority
+
+Rel_Priority <- df %>% 
+  select(Relevanz_priority)
+
+Rel_Priority_c <- na.omit(Rel_Priority)
+
+Rel_Priority_c <- Rel_Priority_c%>% 
+  mutate(Priority_lane = sum(Relevanz_priority)/nrow(Rel_Priority_c))
+         
+#Relevanz club
+
+Rel_club <- df %>% 
+  select(Relevanz_club)
+
+Rel_club_c <- na.omit(Rel_club)
+
+Rel_club_c <- Rel_club_c%>% 
+  mutate(Club = sum(Relevanz_club)/nrow(Rel_club_c))
+
+
+#Relevanz snack
+
+Rel_snack <- df %>% 
+  select(Relevanz_snack)
+
+Rel_snack_c <- na.omit(Rel_snack)
+
+Rel_snack_c <- Rel_snack_c%>% 
+  mutate(Snack = sum(Relevanz_snack)/nrow(Rel_snack_c))
+
+
+#Relevanz club_snack
+
+Rel_club_snack <- df %>% 
+  select(Relevanz_club_snack)
+
+Rel_club_snack_c <- na.omit(Rel_club_snack)
+
+Rel_club_snack_c <- Rel_club_snack_c%>% 
+  mutate(Club_inkl_snacl = sum(Relevanz_club_snack)/nrow(Rel_club_snack_c))
+
+
+#Relevanz flexi
+
+Rel_flexi <- df %>% 
+  select(Relevanz_flexi)
+
+Rel_flexi_c <- na.omit(Rel_flexi)
+
+Rel_flexi_c <- Rel_flexi_c%>% 
+  mutate(Flex_Buchung = sum(Relevanz_flexi)/nrow(Rel_flexi_c))
+
+
+#Relevanz schnell
+
+Rel_schnell <- df %>% 
+  select(Relevanz_schnell)
+
+Rel_schnell_c <- na.omit(Rel_schnell)
+
+Rel_schnell_c <- Rel_schnell_c%>% 
+  mutate(Schnelle_Buchung = sum(Relevanz_schnell)/nrow(Rel_schnell_c))
+
+
+#Relevanz keine
+
+Rel_keiner <- df %>% 
+  select(Relevanz_keiner)
+
+Rel_keiner_c <- na.omit(Rel_keiner)
+
+Rel_keiner_c <- Rel_keiner_c%>% 
+  mutate(Kein_vorteil = sum(Relevanz_keiner)/nrow(Rel_keiner_c))
+
+#Visualization
+Rel_perc <- xtabs(~ mean(Rel_Priority_c$Priority_lane)+mean(Rel_club_c$Club)+mean(Rel_snack_c$Snack)+mean(Rel_club_snack_c$Club_inkl_snacl)+mean(Rel_flexi_c$Flex_Buchung)+mean(Rel_schnell_c$Schnelle_Buchung)+mean(Rel_keiner_c$Kein_vorteil))
+view(Rel_perc)
+
+Percentages_relevance <- as.data.frame(Rel_perc)
+
+Percentages_relevance <- Percentages_relevance %>% 
+  pivot_longer(
+    cols = mean.Rel_Priority_c.Priority_lane.:mean.Rel_keiner_c.Kein_vorteil.,
+    names_to = 'Feature',
+    values_to = 'Percentage'
+  )
+
+Percentages_relevance <- Percentages_relevance %>% 
+  mutate(Percentage_num = as.numeric(paste(Percentage)))
+
+ggplot(Percentages_relevance, aes(x=reorder(Feature, -Percentage_num), y=Percentage_num))+geom_bar(stat = 'identity')+ylim(0,1)
+
+
+# Part 3 - Ranking # tbd
+
+#T1
+
+Ranking_T1 <- df %>% 
+  select('ID', 'Ranking_1', 'Ranking_2', 'Ranking_3', 'Treatment') %>% 
+  filter(Treatment == 1)
+
+
+Ranking_T1 <- Ranking_T1 %>% 
+  pivot_longer(
+    cols = Ranking_1:Ranking_3,
+    names_to = 'Rang',
+    values_to = 'Feature'
+  )
+
+
+ggplot(Ranking_T1, aes(x=Rang, fill=Feature))+geom_bar()
+
+
+# Part 3 - Ranking # tbd
+
+#T2
+
+Ranking_T2 <- df %>% 
+  select('ID', 'Ranking_1', 'Ranking_2', 'Ranking_3', 'Ranking_4', 'Treatment') %>% 
+  filter(Treatment == 2)
+
+
+Ranking_T2 <- Ranking_T2 %>% 
+  pivot_longer(
+    cols = Ranking_1:Ranking_4,
+    names_to = 'Rang',
+    values_to = 'Feature'
+  )
+
+
+ggplot(Ranking_T2, aes(x=Rang, fill=Feature))+geom_bar()
+
+
+#T3
+
+Ranking_T3 <- df %>% 
+  select('ID', 'Ranking_1', 'Ranking_2', 'Ranking_3', 'Ranking_4', 'Treatment') %>% 
+  filter(Treatment == 3)
+
+
+Ranking_T3 <- Ranking_T3 %>% 
+  pivot_longer(
+    cols = Ranking_1:Ranking_4,
+    names_to = 'Rang',
+    values_to = 'Feature'
+  )
+
+
+ggplot(Ranking_T3, aes(x=Rang, fill=Feature))+geom_bar()
+
+
+#T4
+
+Ranking_T4 <- df %>% 
+  select('ID', 'Ranking_1', 'Ranking_2', 'Ranking_3', 'Treatment') %>% 
+  filter(Treatment == 4)
+
+
+Ranking_T4 <- Ranking_T4 %>% 
+  pivot_longer(
+    cols = Ranking_1:Ranking_3,
+    names_to = 'Rang',
+    values_to = 'Feature'
+  )
+
+
+ggplot(Ranking_T4, aes(x=Rang, fill=Feature))+geom_bar()
+
+
+# Part 4 - Naming Club # 
+
+suit_club <- df %>% 
+  select(Passen_club)
+
+clu <- ggplot(suit_club, aes(x=Passen_club))+geom_histogram()
+clu+geom_vline(aes(xintercept=mean(Passen_club)),
+                  color="blue", linetype="dashed", size=1)
+
+nam_club <- df %>% 
+  select(Naming_club)
+
+ggplot(nam_club, aes(x=Naming_club))+geom_bar()
+
+
+# Part 4 - Naming Snack # 
+
+suit_snack <- df %>% 
+  select(Passen_snack)
+
+sna <- ggplot(suit_snack, aes(x=Passen_snack))+geom_histogram()
+sna+geom_vline(aes(xintercept=mean(Passen_snack)),
+               color="blue", linetype="dashed", size=1)
+
+nam_snack <- df %>% 
+  select(Naming_snack)
+
+ggplot(nam_snack, aes(x=Naming_snack))+geom_bar()
+
+
+# Part 5 - Fliegen Frequenz #
+
+fly_f <-df %>% 
+  select(Fliegen_frequenz)
+
+ggplot(fly_f, aes(x=Fliegen_frequenz))+geom_bar()
+
+# Part 6 - Spesen #
+
+off_f <-df %>% 
+  select(Spesen)
+
+ggplot(off_f, aes(x=Spesen))+geom_bar()
+
+
+# Part 7 - Class #
+
+F_class <-df %>% 
+  select(Flugklasse)
+
+ggplot(F_class, aes(x=Flugklasse))+geom_bar()
+
+
+
