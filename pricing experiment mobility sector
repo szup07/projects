@@ -1,13 +1,13 @@
-# Preisgestaltung FZAG: Experiment
+# Pricing in mobility sector
 
 ---
-title "Pricing FZAG"
+title "Pricing mobility"
 author "Sandro Zuppiger"
 
 
 #Arbeitsverzeichnis festlegen
 getwd()
-setwd("C:/Users/SandroZuppiger/Die Ergonomen Usability AG/Kundenprojekte - Dokumente/Flughafen Zürich/12_Preisgestaltung Angebots-Bundle/04_Ergebnisse/01_Analyse")
+setwd("C:")
 
 #Installiere packages
 install.packages('rstatix')
@@ -25,7 +25,7 @@ library(rstatix)
 colors_E <- c("#D10049", "#65081D", "#82D8CF", "#000000", "#3A5A58")
 
 # Import data // Note: Data Frames can hold several variable types, matrices just one variable type
-df <- read_excel("C:/Users/SandroZuppiger/Die Ergonomen Usability AG/Kundenprojekte - Dokumente/Flughafen Zürich/12_Preisgestaltung Angebots-Bundle/04_Ergebnisse/01_Analyse/20230323_data.xlsx")
+df <- read_excel("C: ")
 
 #Inspect Data
 summary(df$Mehr_zahlen) #String
